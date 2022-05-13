@@ -64,7 +64,7 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
     accuracy = loc.accuracy!;
 
     setState(() {
-      locationAvailable = accuracy <= (settings?.accuracy ?? 10000.0);
+      locationAvailable = accuracy.round() <= (settings?.accuracy.round() ?? 10000);
     });
   }
 
