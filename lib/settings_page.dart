@@ -24,6 +24,13 @@ class _SettingsState extends State<SettingsPage> {
           onChanged: (value) => settings.email = value.isNotEmpty ? value.trim() : null
         )
       ),
+      SwitchListTile(title: const Text("Auto Close"),
+        value: settings.autoClose,
+        onChanged: (bool value) {
+          setState(() {
+            settings.autoClose = value;
+          });
+        }),
       ListTile(
         leading: const Text("Accuracy"),
         title: Slider(

@@ -123,5 +123,9 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
     );
 
     await FlutterEmailSender.send(email);
+
+    if (settings!.autoClose) {
+      SystemNavigator.pop();
+    }
   }
 }

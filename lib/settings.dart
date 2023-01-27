@@ -9,11 +9,14 @@ part 'settings.g.dart';
 class Settings {
   String? email;
   double accuracy;
+  bool autoClose;
+
   static File? _store;
 
   Settings({
     this.email,
-    this.accuracy = 10.0});
+    this.accuracy = 10.0,
+    this.autoClose = true});
 
   factory Settings.fromJson(Map<String, dynamic> json) =>
     _$SettingsFromJson(json);
