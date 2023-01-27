@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:format/format.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:location/location.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'settings.dart';
 import 'settings_page.dart';
+
 void main() => runApp(const PWEmailTracker());
 
 class PWEmailTracker extends StatelessWidget {
@@ -30,11 +32,7 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
   Settings? settings;
 
   Location location = Location();
-
-  bool locationAvailable = false;
-  double latitude = 0.0;
-  double longitude = 0.0;
-  double accuracy = 10000.0;
+  LocationData? locationData;
 
   double progressValue = 0.0;
 
@@ -59,12 +57,8 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
   }
 
   getLocation(LocationData loc) {
-    latitude = loc.latitude!;
-    longitude = loc.longitude!;
-    accuracy = loc.accuracy!;
-
     setState(() {
-      locationAvailable = accuracy.round() <= (settings?.accuracy.round() ?? 10000);
+      locationData = loc;
     });
   }
 
@@ -76,6 +70,11 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
       case AppLifecycleState.inactive:
       case AppLifecycleState.detached:
         settings?.save();
+
+        setState(() {
+          locationData = null;
+        });
+
         break;
       case AppLifecycleState.resumed:
         break;
@@ -88,13 +87,13 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
 
     list.add(ListTile(leading: const Text("Email:"), title: Text(settings?.email ?? "Please set your email address in Settings")));
 
-    if (locationAvailable) {
-      list.add(ListTile(title: Text("Location aquired to ${accuracy.round()}m")));
+    if (locationData != null && ((locationData?.accuracy?.round())! <= (settings?.accuracy.round())!)) {
+      list.add(ListTile(title: Text("Location aquired to ${locationData?.accuracy?.round()}m")));
       if (settings?.email != null) {
         list.add(ListTile(title: IconButton(onPressed: sendEmail, icon: const Icon(Icons.email), iconSize: 64.0)));
       }
     } else {
-      list.add(ListTile(title: Text("Waiting for accurate Location - ${accuracy.round()}m")));
+      list.add(ListTile(title: Text(format("Waiting for accurate Location{}", (locationData != null) ? " - ${locationData?.accuracy?.round()}m" : ""))));
     }
 
     return Scaffold(
