@@ -20,6 +20,7 @@ class PWEmailTracker extends StatelessWidget {
     return MaterialApp(
       title: 'Predict Wind Email Tracker',
       home: _Main(),
+      debugShowCheckedModeBanner: false
     );
   }
 }
