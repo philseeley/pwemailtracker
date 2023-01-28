@@ -25,7 +25,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
-def keystorePropertiesFile = rootProject.file("/home/phil/Documents/key.properties")
+def keystorePropertiesFile = rootProject.file("/Users/admin/Documents/key.properties")
 def keystoreProperties = new Properties()
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
