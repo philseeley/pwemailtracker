@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:format/format.dart';
@@ -122,10 +124,38 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
       isHTML: false,
     );
 
-    await FlutterEmailSender.send(email);
+    try {
+      await FlutterEmailSender.send(email);
+    } on PlatformException catch (e) {
+      if (Platform.isIOS && e.code == 'not_available') {
+        showError(context, 'On iOS you must install and configure the Apple EMail App with an account.');
+      }
+      else {
+        showError(context, "Please screenshot this error and send to the developer: "+e.toString());
+      }
+    }
 
     if (settings!.autoClose) {
       SystemNavigator.pop();
     }
   }
+}
+
+void showError(BuildContext context, String error) {
+  showDialog(
+    context: context,
+    barrierDismissible: false, // user must tap button!
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(error),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('Close'),
+            onPressed: () {
+              Navigator.pop(context);
+            }
+          )]
+      );
+    },
+  );
 }
