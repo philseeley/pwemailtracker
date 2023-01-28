@@ -53,7 +53,7 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   getLocation(LocationData loc) {
@@ -88,7 +88,7 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
     list.add(ListTile(leading: const Text("Email:"), title: Text(settings?.email ?? "Please set your email address in Settings")));
 
     if (locationData != null && ((locationData?.accuracy?.round())! <= (settings?.accuracy.round())!)) {
-      list.add(ListTile(title: Text("Location aquired to ${locationData?.accuracy?.round()}m")));
+      list.add(ListTile(title: Text("Location acquired to ${locationData?.accuracy?.round()}m")));
       if (settings?.email != null) {
         list.add(ListTile(title: IconButton(onPressed: sendEmail, icon: const Icon(Icons.email), iconSize: 64.0)));
       }
@@ -116,7 +116,7 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
     String dt = DateFormat('yyyy-MM-dd HH:mm').format(now);
 
     final Email email = Email(
-      body: '${settings?.email} ${locationData?.latitude} ${locationData?.longitude} $dt${format('{:+d}', now.timeZoneOffset.inHours)}00',
+      body: '${settings?.email} ${locationData?.latitude} ${locationData?.longitude} $dt${format('{:+03d}', now.timeZoneOffset.inHours)}${format('{:02d}', now.timeZoneOffset.inMinutes%60)}',
       subject: '',
       recipients: ['tracking@predictwind.com'],
       isHTML: false,
