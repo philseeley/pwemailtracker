@@ -119,7 +119,7 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
     String dt = DateFormat('yyyy-MM-dd HH:mm').format(now);
 
     final Email email = Email(
-      body: '${settings?.email} ${locationData?.latitude} ${locationData?.longitude} $dt${format('{:+03d}', now.timeZoneOffset.inHours)}${format('{:02d}', now.timeZoneOffset.inMinutes%60)}',
+      body: '${settings?.email} ${locationData?.latitude} ${locationData?.longitude} $dt${format('{:+03d}{:02d}', now.timeZoneOffset.inHours, now.timeZoneOffset.inMinutes%60)}',
       subject: '',
       recipients: ['tracking@predictwind.com'],
       isHTML: false,
