@@ -136,7 +136,8 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
       }
     }
 
-    if (settings!.autoClose) {
+    // The iOS guidelines prohibit the auto-closing of apps.
+    if (!Platform.isIOS && settings!.autoClose) {
       SystemNavigator.pop();
     }
   }

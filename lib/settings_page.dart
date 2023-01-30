@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'settings.dart';
 
@@ -23,14 +25,22 @@ class _SettingsState extends State<SettingsPage> {
           initialValue: settings.email,
           onChanged: (value) => settings.email = value.isNotEmpty ? value.trim() : null
         )
-      ),
-      SwitchListTile(title: const Text("Auto Close"),
-        value: settings.autoClose,
-        onChanged: (bool value) {
-          setState(() {
-            settings.autoClose = value;
-          });
-        }),
+      )
+    ];
+
+    // The iOS guidelines prohibit the auto-closing of apps.
+    if (!Platform.isIOS) {
+      list.add(
+        SwitchListTile(title: const Text("Auto Close"),
+          value: settings.autoClose,
+          onChanged: (bool value) {
+            setState(() {
+              settings.autoClose = value;
+            });
+          }));
+    }
+
+    list.add(
       ListTile(
         leading: const Text("Accuracy"),
         title: Slider(
@@ -44,8 +54,7 @@ class _SettingsState extends State<SettingsPage> {
               settings.accuracy = value;
             });
           }),
-      )
-    ];
+      ));
 
     return(Scaffold(
       appBar: AppBar(title: const Text("Settings")),
