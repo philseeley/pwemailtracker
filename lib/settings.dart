@@ -5,18 +5,38 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'settings.g.dart';
 
+enum CoordFormat {
+  decimalDegrees('Decimal Degrees'),
+  decimalMinutes('Decimal Minutes'),
+  degreesMinutesSeconds('Degrees Minutes Seconds');
+
+  final String name;
+
+  const CoordFormat(this.name);
+}
+
 @JsonSerializable()
 class Settings {
-  String? email;
+  bool firstUse;
+  String? ident;
+  String destinationEmail;
+  CoordFormat coordFormat;
+  bool cardinalFormat;
   double accuracy;
   bool autoClose;
+  bool includeDateTime;
 
   static File? _store;
 
   Settings({
-    this.email,
+    this.firstUse = true,
+    this.ident,
+    this.destinationEmail = 'tracking@predictwind.com',
+    this.coordFormat = CoordFormat.decimalDegrees,
+    this.cardinalFormat = false,
     this.accuracy = 10.0,
-    this.autoClose = true});
+    this.autoClose = false,
+    this.includeDateTime = true});
 
   factory Settings.fromJson(Map<String, dynamic> json) =>
     _$SettingsFromJson(json);

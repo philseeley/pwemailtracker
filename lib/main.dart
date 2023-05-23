@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:format/format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
+import 'package:share/share.dart';
 import 'package:location/location.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'settings.dart';
@@ -38,6 +39,8 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
   LocationData? locationData;
 
   double progressValue = 0.0;
+
+  String body = '';
 
   _MainState() {
     init();
@@ -88,15 +91,22 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     List<Widget> list = [];
 
-    list.add(ListTile(leading: const Text("Email:"), title: Text(settings?.email ?? "Please set your email address in Settings")));
-
     if (locationData != null && ((locationData?.accuracy?.round())! <= (settings?.accuracy.round())!)) {
-      list.add(ListTile(title: Text("Location acquired to ${locationData?.accuracy?.round()}m")));
-      if (settings?.email != null) {
-        list.add(ListTile(title: IconButton(onPressed: sendEmail, icon: const Icon(Icons.email), iconSize: 64.0)));
+      body = getBody();
+
+      if(settings!.firstUse) {
+        list.add(ListTile(leading: const Text("Please review Settings before first use"), title: IconButton(onPressed: () => showSettingsPage(), icon: const Icon(Icons.settings))));
       }
+
+      list.add(ListTile(title: Text("Location acquired to ${locationData?.accuracy?.round()}m")));
+      list.add(ListTile(title: Text(body)));
+      list.add(Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        IconButton(onPressed: sendEmail, icon: const Icon(Icons.email), iconSize: 64.0),
+        IconButton(onPressed: share, icon: const Icon(Icons.share), iconSize: 64.0)
+      ]));
     } else {
       list.add(ListTile(title: Text(format("Waiting for accurate Location{}", (locationData != null) ? " - ${locationData?.accuracy?.round()}m" : ""))));
+      body = '';
     }
 
     return Scaffold(
@@ -106,22 +116,79 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
   }
 
   showSettingsPage () async {
+
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
         return SettingsPage(settings!);
       }));
 
-    setState(() {});
+    setState(() {
+      settings?.firstUse = false;
+    });
   }
   
-  void sendEmail() async {
+  String getBody() {
     DateTime now = DateTime.now();
     String dt = DateFormat('yyyy-MM-dd HH:mm').format(now);
 
+    String northSouth = locationData!.latitude! < 0 ? 'S' : 'N';
+    String westEast = locationData!.longitude! < 0 ? 'W' : 'E';
+
+    String coords = '${locationData?.latitude!.toStringAsFixed(5)} ${locationData?.longitude!.toStringAsFixed(5)}';
+
+    if(settings!.cardinalFormat) {
+      coords = '${locationData?.latitude!.abs().toStringAsFixed(5)} $northSouth ${locationData?.longitude!.abs().toStringAsFixed(5)} $westEast';
+    }
+
+    if (settings?.coordFormat != CoordFormat.decimalDegrees) {
+      int latDegrees = locationData!.latitude!.toInt();
+      double latMinutes = 60 * locationData!.latitude!.remainder(latDegrees).abs();
+
+      int lonDegrees = locationData!.longitude!.toInt();
+      double lonMinutes = 60 * locationData!.longitude!.remainder(lonDegrees).abs();
+
+      coords = '$latDegrees ${latMinutes.toStringAsFixed(3)} $lonDegrees ${lonMinutes.toStringAsFixed(3)}';
+
+      if (settings!.cardinalFormat) {
+        coords = '${latDegrees.abs()} ${latMinutes.toStringAsFixed(3)} $northSouth ${lonDegrees.abs()} ${lonMinutes.toStringAsFixed(3)} $westEast';
+      }
+
+      if (settings?.coordFormat == CoordFormat.degreesMinutesSeconds) {
+        double latSeconds = 60 * latMinutes.remainder(latMinutes.toInt());
+        double lonSeconds = 60 * lonMinutes.remainder(lonMinutes.toInt());
+
+        coords = '$latDegrees ${latMinutes.toStringAsFixed(0)} ${latSeconds.toStringAsFixed(2)} $lonDegrees ${lonMinutes.toStringAsFixed(0)} ${lonSeconds.toStringAsFixed(2)}';
+
+        if (settings!.cardinalFormat) {
+          coords = '${latDegrees.abs()} ${latMinutes.toStringAsFixed(0)} ${latSeconds.toStringAsFixed(2)} $northSouth ${lonDegrees.abs()} ${lonMinutes.toStringAsFixed(0)} ${lonSeconds.toStringAsFixed(2)} $westEast';
+        }
+      }
+    }
+
+    String body = '';
+    if(settings?.ident != null) {
+      body += '${settings?.ident} ';
+    }
+    body += coords;
+
+    if(settings!.includeDateTime) {
+      body += ' $dt${format('{:+03d}{:02d}', now.timeZoneOffset.inHours, now.timeZoneOffset.inMinutes%60)}';
+    }
+
+    return body;
+  }
+
+  void sendEmail() async {
+
+    List<String> recipients = [];
+    if(settings!.destinationEmail.isNotEmpty) {
+      recipients.add(settings!.destinationEmail);
+    }
+
     final Email email = Email(
-      body: '${settings?.email} ${locationData?.latitude} ${locationData?.longitude} $dt${format('{:+03d}{:02d}', now.timeZoneOffset.inHours, now.timeZoneOffset.inMinutes%60)}',
+      body: body,
       subject: '',
-      recipients: ['tracking@predictwind.com'],
+      recipients: recipients,
       isHTML: false,
     );
 
@@ -141,6 +208,11 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
       SystemNavigator.pop();
     }
   }
+
+  void share() {
+    Share.share(body);
+  }
+
 }
 
 void showError(BuildContext context, String error) {
