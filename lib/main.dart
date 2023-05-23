@@ -157,10 +157,10 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
         double latSeconds = 60 * latMinutes.remainder(latMinutes.toInt());
         double lonSeconds = 60 * lonMinutes.remainder(lonMinutes.toInt());
 
-        coords = '$latDegrees ${latMinutes.toStringAsFixed(0)} ${latSeconds.toStringAsFixed(2)} $lonDegrees ${lonMinutes.toStringAsFixed(0)} ${lonSeconds.toStringAsFixed(2)}';
+        coords = '$latDegrees ${latMinutes.toInt()} ${latSeconds.toStringAsFixed(2)} $lonDegrees ${lonMinutes.toInt()} ${lonSeconds.toStringAsFixed(2)}';
 
         if (settings!.cardinalFormat) {
-          coords = '${latDegrees.abs()} ${latMinutes.toStringAsFixed(0)} ${latSeconds.toStringAsFixed(2)} $northSouth ${lonDegrees.abs()} ${lonMinutes.toStringAsFixed(0)} ${lonSeconds.toStringAsFixed(2)} $westEast';
+          coords = '${latDegrees.abs()} ${latMinutes.toInt()} ${latSeconds.toStringAsFixed(2)} $northSouth ${lonDegrees.abs()} ${lonMinutes.toInt()} ${lonSeconds.toStringAsFixed(2)} $westEast';
         }
       }
     }
