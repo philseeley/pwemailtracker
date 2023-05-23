@@ -209,10 +209,14 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
     }
   }
 
-  void share() {
-    Share.share(body);
-  }
+  void share() async {
+    await Share.share(body);
 
+    // The iOS guidelines prohibit the auto-closing of apps.
+    if (!Platform.isIOS && settings!.autoClose) {
+      SystemNavigator.pop();
+    }
+  }
 }
 
 void showError(BuildContext context, String error) {
