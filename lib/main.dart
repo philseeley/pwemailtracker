@@ -1,13 +1,13 @@
 import 'dart:io';
 
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 import 'package:format/format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:share/share.dart';
 import 'package:location/location.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:latlong_formatter/latlong_formatter.dart';
 import 'settings.dart';
 import 'settings_page.dart';
 
@@ -19,7 +19,7 @@ class PWEmailTracker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Predict Wind Email Tracker',
+      title: 'Email Tracker',
       home: _Main(),
       debugShowCheckedModeBanner: false
     );
@@ -33,12 +33,12 @@ class _Main extends StatefulWidget {
 
 class _MainState extends State<_Main> with WidgetsBindingObserver {
 
-  Settings? settings;
+  late Settings settings;
 
   Location location = Location();
   LocationData? locationData;
-
-  double progressValue = 0.0;
+  late LatLongFormatter bodyFormatter;
+  late LatLongFormatter subjectFormatter;
 
   String body = '';
 
@@ -47,13 +47,15 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
   }
 
   init() async {
-    settings ??= await Settings.load();
+    settings = await Settings.load();
 
     if(await location.serviceEnabled()) {
       location.onLocationChanged.listen(getLocation);
     } else {
       Fluttertoast.showToast(msg: "Location is disabled", toastLength: Toast.LENGTH_LONG);
     }
+
+    setFormatters();
   }
 
   @override
@@ -75,7 +77,7 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
       case AppLifecycleState.paused:
       case AppLifecycleState.inactive:
       case AppLifecycleState.detached:
-        settings?.save();
+        settings.save();
 
         setState(() {
           locationData = null;
@@ -91,10 +93,10 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     List<Widget> list = [];
 
-    if (locationData != null && ((locationData?.accuracy?.round())! <= (settings?.accuracy.round())!)) {
+    if (locationData != null && ((locationData?.accuracy?.round())! <= (settings.accuracy.round()))) {
       body = getBody();
 
-      if(settings!.firstUse) {
+      if(settings.firstUse) {
         list.add(ListTile(leading: const Text("Please review Settings before first use"), title: IconButton(onPressed: () => showSettingsPage(), icon: const Icon(Icons.settings))));
       }
 
@@ -105,12 +107,12 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
         IconButton(onPressed: share, icon: const Icon(Icons.share), iconSize: 64.0)
       ]));
     } else {
-      list.add(ListTile(title: Text(format("Waiting for accurate Location{}", (locationData != null) ? " - ${locationData?.accuracy?.round()}m" : ""))));
+      list.add(ListTile(title: Text(format("Waiting for accurate Location{}", (locationData != null) ? ": ${locationData?.accuracy?.round()}m" : ""))));
       body = '';
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Predict Wind Email Tracker"), actions: [IconButton(onPressed: () {showSettingsPage();}, icon:const Icon(Icons.settings))]),
+      appBar: AppBar(title: const Text("Email Tracker"), actions: [IconButton(onPressed: () {showSettingsPage();}, icon:const Icon(Icons.settings))]),
       body: Column(children: list)
     );
   }
@@ -119,75 +121,35 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
 
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
-        return SettingsPage(settings!);
+        return SettingsPage(settings);
       }));
 
     setState(() {
-      settings?.firstUse = false;
+      try {
+        setFormatters();
+      } catch (e) {
+        showError(context, e.toString());
+      }
+      settings.firstUse = false;
     });
   }
-  
+
+  setFormatters() {
+    bodyFormatter = LatLongFormatter(settings.template.template.isNotEmpty ? settings.template.template : settings.customTemplate);
+    subjectFormatter = LatLongFormatter(settings.template.subject??settings.subject);
+  }
   String getBody() {
-    DateTime now = DateTime.now();
-    String dt = DateFormat('yyyy-MM-dd HH:mm').format(now);
-
-    String northSouth = locationData!.latitude! < 0 ? 'S' : 'N';
-    String westEast = locationData!.longitude! < 0 ? 'W' : 'E';
-
-    String coords = '${locationData?.latitude!.toStringAsFixed(5)} ${locationData?.longitude!.toStringAsFixed(5)}';
-
-    if(settings!.cardinalFormat) {
-      coords = '${locationData?.latitude!.abs().toStringAsFixed(5)} $northSouth ${locationData?.longitude!.abs().toStringAsFixed(5)} $westEast';
-    }
-
-    if (settings?.coordFormat != CoordFormat.decimalDegrees) {
-      int latDegrees = locationData!.latitude!.toInt();
-      double latMinutes = 60 * locationData!.latitude!.remainder(latDegrees).abs();
-
-      int lonDegrees = locationData!.longitude!.toInt();
-      double lonMinutes = 60 * locationData!.longitude!.remainder(lonDegrees).abs();
-
-      coords = '$latDegrees ${latMinutes.toStringAsFixed(3)} $lonDegrees ${lonMinutes.toStringAsFixed(3)}';
-
-      if (settings!.cardinalFormat) {
-        coords = '${latDegrees.abs()} ${latMinutes.toStringAsFixed(3)} $northSouth ${lonDegrees.abs()} ${lonMinutes.toStringAsFixed(3)} $westEast';
-      }
-
-      if (settings?.coordFormat == CoordFormat.degreesMinutesSeconds) {
-        double latSeconds = 60 * latMinutes.remainder(latMinutes.toInt());
-        double lonSeconds = 60 * lonMinutes.remainder(lonMinutes.toInt());
-
-        coords = '$latDegrees ${latMinutes.toInt()} ${latSeconds.toStringAsFixed(2)} $lonDegrees ${lonMinutes.toInt()} ${lonSeconds.toStringAsFixed(2)}';
-
-        if (settings!.cardinalFormat) {
-          coords = '${latDegrees.abs()} ${latMinutes.toInt()} ${latSeconds.toStringAsFixed(2)} $northSouth ${lonDegrees.abs()} ${lonMinutes.toInt()} ${lonSeconds.toStringAsFixed(2)} $westEast';
-        }
-      }
-    }
-
-    String body = '';
-    if(settings?.ident != null) {
-      body += '${settings?.ident} ';
-    }
-    body += coords;
-
-    if(settings!.includeDateTime) {
-      body += ' $dt${format('{:+03d}{:02d}', now.timeZoneOffset.inHours, now.timeZoneOffset.inMinutes%60)}';
-    }
-
-    return body;
+    return bodyFormatter.format(LatLong(locationData!.latitude!, locationData!.longitude!), username: settings.username, password: settings.password);
   }
 
   void sendEmail() async {
-
-    List<String> recipients = [];
-    if(settings!.destinationEmail.isNotEmpty) {
-      recipients.add(settings!.destinationEmail);
-    }
+    List<String> recipients = [
+      settings.template.destinationEmail??settings.customDestinationEmail
+    ];
 
     final Email email = Email(
       body: body,
-      subject: '',
+      subject: subjectFormatter.format(LatLong(locationData!.latitude!, locationData!.longitude!), username: settings.username, password: settings.password),
       recipients: recipients,
       isHTML: false,
     );
@@ -204,7 +166,7 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
     }
 
     // The iOS guidelines prohibit the auto-closing of apps.
-    if (!Platform.isIOS && settings!.autoClose) {
+    if (!Platform.isIOS && settings.autoClose) {
       SystemNavigator.pop();
     }
   }
@@ -213,7 +175,7 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
     await Share.share(body);
 
     // The iOS guidelines prohibit the auto-closing of apps.
-    if (!Platform.isIOS && settings!.autoClose) {
+    if (!Platform.isIOS && settings.autoClose) {
       SystemNavigator.pop();
     }
   }

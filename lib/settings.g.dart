@@ -8,31 +8,33 @@ part of 'settings.dart';
 
 Settings _$SettingsFromJson(Map<String, dynamic> json) => Settings(
       firstUse: json['firstUse'] as bool? ?? true,
-      ident: json['ident'] as String?,
-      destinationEmail:
-          json['destinationEmail'] as String? ?? 'tracking@predictwind.com',
-      coordFormat:
-          $enumDecodeNullable(_$CoordFormatEnumMap, json['coordFormat']) ??
-              CoordFormat.decimalDegrees,
-      cardinalFormat: json['cardinalFormat'] as bool? ?? false,
+      template: $enumDecodeNullable(_$TemplatesEnumMap, json['template']) ??
+          Templates.predictWind,
       accuracy: (json['accuracy'] as num?)?.toDouble() ?? 10.0,
       autoClose: json['autoClose'] as bool? ?? false,
-      includeDateTime: json['includeDateTime'] as bool? ?? true,
+      username: json['username'] as String? ?? '',
+      password: json['password'] as String? ?? '',
+      customDestinationEmail: json['customDestinationEmail'] as String? ?? '',
+      subject: json['subject'] as String? ?? '',
+      customTemplate: json['customTemplate'] as String? ?? '',
     );
 
 Map<String, dynamic> _$SettingsToJson(Settings instance) => <String, dynamic>{
       'firstUse': instance.firstUse,
-      'ident': instance.ident,
-      'destinationEmail': instance.destinationEmail,
-      'coordFormat': _$CoordFormatEnumMap[instance.coordFormat]!,
-      'cardinalFormat': instance.cardinalFormat,
+      'template': _$TemplatesEnumMap[instance.template]!,
       'accuracy': instance.accuracy,
       'autoClose': instance.autoClose,
-      'includeDateTime': instance.includeDateTime,
+      'username': instance.username,
+      'password': instance.password,
+      'customDestinationEmail': instance.customDestinationEmail,
+      'subject': instance.subject,
+      'customTemplate': instance.customTemplate,
     };
 
-const _$CoordFormatEnumMap = {
-  CoordFormat.decimalDegrees: 'decimalDegrees',
-  CoordFormat.decimalMinutes: 'decimalMinutes',
-  CoordFormat.degreesMinutesSeconds: 'degreesMinutesSeconds',
+const _$TemplatesEnumMap = {
+  Templates.predictWind: 'predictWind',
+  Templates.noForeignLand: 'noForeignLand',
+  Templates.noForeignLandBlog: 'noForeignLandBlog',
+  Templates.desCason: 'desCason',
+  Templates.custom: 'custom',
 };

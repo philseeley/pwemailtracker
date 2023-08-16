@@ -1,8 +1,8 @@
-# PredictWind EMail Tracker
+# EMail Tracker
 
-A simple application to manually add entries via email to a Predict Wind tracking page.
+An application to send emails to various tracking pages.
 
-This App is for when you've temporarily suspended your Iridium Go service, but would still like to log your location to your Predict Wind tracking page.
+For example, if you've temporarily suspended your Iridium Go service, but would still like to log your location to your Predict Wind tracking page.
 It does this by writing an email to the Predict Wind tracking address formatted to the required specification: https://help.predictwind.com/en/articles/2884493-how-to-send-manual-gps-tracking-updates-via-email.
 
 Note: 
