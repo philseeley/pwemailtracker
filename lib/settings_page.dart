@@ -27,28 +27,42 @@ class _SettingsState extends State<SettingsPage> {
 
     List<Widget> list = [
       ListTile(
-          leading: const Text("Username"),
-          title: TextFormField(
-              initialValue: settings.username,
-              onChanged: (value) => settings.username = value.trim()
+        leading: const Text("Accuracy"),
+        title: Slider(
+            min: 5.0,
+            max: 100.0,
+            divisions: 19,
+            value: settings.accuracy,
+            label: "${settings.accuracy}",
+            onChanged: (double value) {
+              setState(() {
+                settings.accuracy = value;
+              });
+            }),
+      ),
+      ListTile(
+          leading: const Text("Identity"),
+              title: TextFormField(
+              textInputAction: TextInputAction.newline,
+              keyboardType: TextInputType.multiline,
+              minLines: 1,
+              maxLines: null,
+              initialValue: settings.ident.join('\n'),
+              onChanged: (value) => settings.ident = value.trim().split('\n')
           )
       ),
       ListTile(
-          leading: const Text("Password"),
-          title: TextFormField(
-              initialValue: settings.password,
-              onChanged: (value) => settings.password = value.trim()
-          )
-      ),
-      ListTile(
-          leading: const Text("Body Template"),
+          leading: const Text("Template"),
           title: DropdownButton(items: formatItems,
               value: settings.template,
               onChanged: (Templates? value) {
                 setState(() {
                   settings.template = value!;
                 });
-              })
+              }),
+          trailing: settings.template == Templates.custom ? null : IconButton(
+            onPressed: () {copyTemplate();},
+            icon:const Icon(Icons.copy))
       ),
       ListTile(
           leading: const Text("Destination Email"),
@@ -60,15 +74,21 @@ class _SettingsState extends State<SettingsPage> {
       ListTile(
           leading: const Text("Subject Template"),
           title: TextFormField(
-              initialValue: settings.subject,
-              onChanged: (value) => settings.subject = value.trim()
+            enabled: settings.template == Templates.custom,
+            initialValue: settings.subjectTemplate,
+            onChanged: (value) => settings.subjectTemplate = value.trim()
           )
       ),
       ListTile(
-          leading: const Text("Custom Template"),
+          leading: const Text("Body Template"),
           title: TextFormField(
-              initialValue: settings.customTemplate,
-              onChanged: (value) => settings.customTemplate = value
+            enabled: settings.template == Templates.custom,
+            textInputAction: TextInputAction.newline,
+            keyboardType: TextInputType.multiline,
+            minLines: 1,
+            maxLines: null,
+            initialValue: settings.bodyTemplate,
+            onChanged: (value) => settings.bodyTemplate = value
           )
       ),
     ];
@@ -85,22 +105,6 @@ class _SettingsState extends State<SettingsPage> {
           }));
     }
 
-    list.add(
-      ListTile(
-        leading: const Text("Accuracy"),
-        title: Slider(
-          min: 5.0,
-          max: 100.0,
-          divisions: 19,
-          value: settings.accuracy,
-          label: "${settings.accuracy}",
-          onChanged: (double value) {
-            setState(() {
-              settings.accuracy = value;
-            });
-          }),
-      ));
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("Settings"),
@@ -108,14 +112,22 @@ class _SettingsState extends State<SettingsPage> {
           IconButton(onPressed: () {showHelpPage();}, icon:const Icon(Icons.help))
         ],
       ),
-      body: ListView(children: list)
+      body: ListView(key: UniqueKey(), children: list)
     );
+  }
+
+  copyTemplate () {
+    Settings s = widget.settings;
+    setState(() {
+      s.bodyTemplate = s.template.bodyTemplate??'';
+      s.subjectTemplate = s.template.subjectTemplate??'';
+    });
   }
 
   showHelpPage () async {
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
-      return HelpPage();
+      return const HelpPage();
     }));
   }
 }

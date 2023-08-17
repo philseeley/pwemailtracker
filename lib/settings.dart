@@ -6,18 +6,18 @@ import 'package:json_annotation/json_annotation.dart';
 part 'settings.g.dart';
 
 enum Templates {
-  predictWind('Predict Wind', '{user} {lat-d.ddddd} {lon-d.ddddd} {localyyyy-MM-dd HH:mm}{tz}', 'tracking@predictwind.com', ''),
+  predictWind('Predict Wind', '{ident} {lat-d.ddddd} {lon-d.ddddd} {localyyyy-MM-dd HH:mm}{tz}', 'tracking@predictwind.com', ''),
   noForeignLand('No Foreign Land', 'LAT|{latd|m.mmm|c}\nLON|{lond|m.mmm|c}', 'tracking@noforeignland.com', ''),
   noForeignLandBlog('No Foreign Land + Blog', 'LAT|{latd|m.mmm|c}\nLON|{lond|m.mmm|c}\n\nBlog here\n----', 'tracking@noforeignland.com', ''),
-  desCason('Des Cason', 'Hi Des,\n\nOn {utcyyyy-MM-dd} at {utcHH:mm} UTC, {pass} is at:\n\n{latd m.mmm c}, {lond m.mmm c}\n\nKind Regards\n{user}', null, 'Position of {user} on {pass}'),
-  custom('Custom', '', null, null);
+  desCason('Des Cason', 'Hi Des,\n\nOn {utcyyyy-MM-dd} at {utcHH:mm} UTC, {ident1} is at:\n\n{latd m.mmm c}, {lond m.mmm c}\n\nKind Regards\n{ident}', null, 'Position of {ident} on {ident1}'),
+  custom('Custom', null, null, null);
 
   final String name;
-  final String template;
+  final String? bodyTemplate;
   final String? destinationEmail;
-  final String? subject;
+  final String? subjectTemplate;
 
-  const Templates(this.name, this.template, this.destinationEmail, this.subject);
+  const Templates(this.name, this.bodyTemplate, this.destinationEmail, this.subjectTemplate);
 }
 
 @JsonSerializable()
@@ -26,11 +26,10 @@ class Settings {
   Templates template;
   double accuracy;
   bool autoClose;
-  String username;
-  String password;
+  List<String> ident = [];
   String customDestinationEmail;
-  String subject;
-  String customTemplate;
+  String subjectTemplate;
+  String bodyTemplate;
 
   static File? _store;
 
@@ -39,11 +38,10 @@ class Settings {
     this.template = Templates.predictWind,
     this.accuracy = 10.0,
     this.autoClose = false,
-    this.username = '',
-    this.password = '',
+    this.ident = const [],
     this.customDestinationEmail = '',
-    this.subject = '',
-    this.customTemplate = ''
+    this.subjectTemplate = '',
+    this.bodyTemplate = ''
   });
 
   factory Settings.fromJson(Map<String, dynamic> json) =>

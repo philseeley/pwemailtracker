@@ -12,11 +12,12 @@ Settings _$SettingsFromJson(Map<String, dynamic> json) => Settings(
           Templates.predictWind,
       accuracy: (json['accuracy'] as num?)?.toDouble() ?? 10.0,
       autoClose: json['autoClose'] as bool? ?? false,
-      username: json['username'] as String? ?? '',
-      password: json['password'] as String? ?? '',
+      ident:
+          (json['ident'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+              const [],
       customDestinationEmail: json['customDestinationEmail'] as String? ?? '',
-      subject: json['subject'] as String? ?? '',
-      customTemplate: json['customTemplate'] as String? ?? '',
+      subjectTemplate: json['subject'] as String? ?? '',
+      bodyTemplate: json['customTemplate'] as String? ?? '',
     );
 
 Map<String, dynamic> _$SettingsToJson(Settings instance) => <String, dynamic>{
@@ -24,11 +25,10 @@ Map<String, dynamic> _$SettingsToJson(Settings instance) => <String, dynamic>{
       'template': _$TemplatesEnumMap[instance.template]!,
       'accuracy': instance.accuracy,
       'autoClose': instance.autoClose,
-      'username': instance.username,
-      'password': instance.password,
+      'ident': instance.ident,
       'customDestinationEmail': instance.customDestinationEmail,
-      'subject': instance.subject,
-      'customTemplate': instance.customTemplate,
+      'subject': instance.subjectTemplate,
+      'customTemplate': instance.bodyTemplate,
     };
 
 const _$TemplatesEnumMap = {

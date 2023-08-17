@@ -14,30 +14,34 @@ class HelpPage extends StatelessWidget {
         config: MarkdownConfig(configs: [LinkConfig(onTap: openURL)]),
         data: '''
 # Email Tracker
+Set the location "Accuracy" appropriate for you. You can email or share the data when your location has been accurately obtained.
+
+On Android, if "Auto Close" is enabled, the app will close once the "EMail" or "Share" buttons have been pressed.
+
 Predefined templates sre provided for well known tracking applications and destinations.
 
 Contact [Phil](mailto:feedback@wheretofly.info?subject=EMail%20Tracker%20Feedback) if you would like a template added.
 
 ## Predict Wind
-The "Username" is required to be your account email address, but emails can be sent from any address.
+The first line of "Identity" is required to be your account email address, but emails can be sent from any address.
 
 ## No Foreign Land
 Make sure the email you send from is configured in the web app, see [https://www.noforeignland.com/help/boat/move-email](https://www.noforeignland.com/help/boat/move-email)
 
-## Des Cason
-Des is a weather router from South Africa. Set the "Username" to your name(s) and the "Password" to your boat name.
-
-After you've engaged Des set his email address in the "Destination Email" field.
+## Weather Router
+After you've engaged a weather router set his email address in the "Destination Email" field and
+set three lines of "Identity" to your name(s), your boat name and your router's name.
 
 ## Custom
+**Note:** you can copy a pre-defined template using the "Copy" button.
+
 You can define custom email body and subject templates using the following fields:
-- {lat<loc format>}
-- {lon<loc format>}
-- {local<time format>}
-- {utc<time format>}
-- {tz[separator]}
-- {user}
-- {pass}
+- {lat<loc format>} -- Latitude.
+- {lon<loc format>} -- Longitude.
+- {local<time format>} -- Local time.
+- {utc<time format>} -- Time in UTC.
+- {tz[separator]} -- Local Time Zone, of the form "+05[separator]30".
+- {ident[index]} -- Identity information line indexed from 0 (0 is optional). 
 
 Where:
 **<loc format>** can be:
@@ -55,15 +59,27 @@ A leading "0" will pad the field to a fixed length.
 
 **<time format>** can be anything defined [here](https://api.flutter.dev/flutter/intl/DateFormat-class.html).
 
-Use "\\n" to insert line breaks.
+### For example:
 
-For example the template:
+With three lines of Identity:
+  Joe Blogs
+  SV Billy Do
+  Fred
 
-Hi there,\\n\\nOn {utcyyyy-MM-dd} at {utcHH:mm} UTC, {pass} is at:\\n\\n{latd m.mmm c}, {lond m.mmm c}\\n\\nCheers\\n{user}
+The template:
+```
+Hi {ident2},
 
+On {utcyyyy-MM-dd} at {utcHH:mm} UTC, {ident1} is at:
+
+{latd m.mmm c}, {lond m.mmm c}
+
+Cheers
+{ident}
+```
 Would produce:
-
-Hi there,
+```
+Hi Fred,
 
 On 2023-08-16 at 19:02 UTC, SV Billy Do is at:
 
@@ -71,6 +87,7 @@ On 2023-08-16 at 19:02 UTC, SV Billy Do is at:
 
 Cheers
 Joe Blogs
+```
 ''')
     );
   }

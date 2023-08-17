@@ -135,11 +135,23 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
   }
 
   setFormatters() {
-    bodyFormatter = LatLongFormatter(settings.template.template.isNotEmpty ? settings.template.template : settings.customTemplate);
-    subjectFormatter = LatLongFormatter(settings.template.subject??settings.subject);
+    try {
+      bodyFormatter = LatLongFormatter(settings.template.bodyTemplate ?? settings.bodyTemplate);
+    } catch (e) {
+      showError(context, e.toString());
+      bodyFormatter = LatLongFormatter('');
+    }
+    try {
+      subjectFormatter =
+          LatLongFormatter(settings.template.subjectTemplate ?? settings.subjectTemplate);
+    } catch (e) {
+      showError(context, e.toString());
+      bodyFormatter = LatLongFormatter('');
+    }
   }
+
   String getBody() {
-    return bodyFormatter.format(LatLong(locationData!.latitude!, locationData!.longitude!), username: settings.username, password: settings.password);
+    return bodyFormatter.format(LatLong(locationData!.latitude!, locationData!.longitude!), ident: settings.ident);
   }
 
   void sendEmail() async {
@@ -149,7 +161,7 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
 
     final Email email = Email(
       body: body,
-      subject: subjectFormatter.format(LatLong(locationData!.latitude!, locationData!.longitude!), username: settings.username, password: settings.password),
+      subject: subjectFormatter.format(LatLong(locationData!.latitude!, locationData!.longitude!), ident: settings.ident),
       recipients: recipients,
       isHTML: false,
     );
