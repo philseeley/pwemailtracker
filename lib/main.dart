@@ -155,9 +155,7 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
   }
 
   void sendEmail() async {
-    List<String> recipients = [
-      settings.template.destinationEmail??settings.customDestinationEmail
-    ];
+    List<String> recipients = settings.template.destinationEmails??settings.destinationEmails;
 
     final Email email = Email(
       body: body,

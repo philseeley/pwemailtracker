@@ -15,9 +15,12 @@ Settings _$SettingsFromJson(Map<String, dynamic> json) => Settings(
       ident:
           (json['ident'] as List<dynamic>?)?.map((e) => e as String).toList() ??
               const [],
-      customDestinationEmail: json['customDestinationEmail'] as String? ?? '',
-      subjectTemplate: json['subject'] as String? ?? '',
-      bodyTemplate: json['customTemplate'] as String? ?? '',
+      destinationEmails: (json['destinationEmail'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
+      subjectTemplate: json['subjectTemplate'] as String? ?? '',
+      bodyTemplate: json['bodyTemplate'] as String? ?? '',
     );
 
 Map<String, dynamic> _$SettingsToJson(Settings instance) => <String, dynamic>{
@@ -26,15 +29,15 @@ Map<String, dynamic> _$SettingsToJson(Settings instance) => <String, dynamic>{
       'accuracy': instance.accuracy,
       'autoClose': instance.autoClose,
       'ident': instance.ident,
-      'customDestinationEmail': instance.customDestinationEmail,
-      'subject': instance.subjectTemplate,
-      'customTemplate': instance.bodyTemplate,
+      'destinationEmail': instance.destinationEmails,
+      'subjectTemplate': instance.subjectTemplate,
+      'bodyTemplate': instance.bodyTemplate,
     };
 
 const _$TemplatesEnumMap = {
   Templates.predictWind: 'predictWind',
   Templates.noForeignLand: 'noForeignLand',
   Templates.noForeignLandBlog: 'noForeignLandBlog',
-  Templates.desCason: 'desCason',
+  Templates.weatherRouter: 'weatherRouter',
   Templates.custom: 'custom',
 };

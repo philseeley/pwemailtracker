@@ -40,15 +40,30 @@ class _SettingsState extends State<SettingsPage> {
               });
             }),
       ),
+    ];
+
+    // The iOS guidelines prohibit the auto-closing of apps.
+    if (!Platform.isIOS) {
+      list.add(
+          SwitchListTile(title: const Text("Auto Close"),
+              value: settings.autoClose,
+              onChanged: (bool value) {
+                setState(() {
+                  settings.autoClose = value;
+                });
+              }));
+    }
+
+    list.addAll([
       ListTile(
           leading: const Text("Identity"),
-              title: TextFormField(
-              textInputAction: TextInputAction.newline,
-              keyboardType: TextInputType.multiline,
-              minLines: 1,
-              maxLines: null,
-              initialValue: settings.ident.join('\n'),
-              onChanged: (value) => settings.ident = value.trim().split('\n')
+            title: TextFormField(
+            textInputAction: TextInputAction.newline,
+            keyboardType: TextInputType.multiline,
+            minLines: 1,
+            maxLines: null,
+            initialValue: settings.ident.join('\n'),
+            onChanged: (value) => settings.ident = value.trim().split('\n')
           )
       ),
       ListTile(
@@ -65,10 +80,14 @@ class _SettingsState extends State<SettingsPage> {
             icon:const Icon(Icons.copy))
       ),
       ListTile(
-          leading: const Text("Destination Email"),
+          leading: const Text("Destination Emails"),
           title: TextFormField(
-              initialValue: settings.customDestinationEmail,
-              onChanged: (value) => settings.customDestinationEmail = value.trim()
+            textInputAction: TextInputAction.newline,
+            keyboardType: TextInputType.multiline,
+            minLines: 1,
+            maxLines: null,
+            initialValue: settings.destinationEmails.join('\n'),
+            onChanged: (value) => settings.destinationEmails = value.trim().split('\n')
           )
       ),
       ListTile(
@@ -91,19 +110,7 @@ class _SettingsState extends State<SettingsPage> {
             onChanged: (value) => settings.bodyTemplate = value
           )
       ),
-    ];
-
-    // The iOS guidelines prohibit the auto-closing of apps.
-    if (!Platform.isIOS) {
-      list.add(
-        SwitchListTile(title: const Text("Auto Close"),
-          value: settings.autoClose,
-          onChanged: (bool value) {
-            setState(() {
-              settings.autoClose = value;
-            });
-          }));
-    }
+    ]);
 
     return Scaffold(
       appBar: AppBar(
