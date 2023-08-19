@@ -29,8 +29,7 @@ The first line of "Information" is required to be your account email address, bu
 Make sure the email you send from is configured in the web app, see [https://www.noforeignland.com/help/boat/move-email](https://www.noforeignland.com/help/boat/move-email)
 
 ## Weather Router
-After you've engaged a weather router set his email address in the "Destination Email" field and
-set three lines of "Information" to your name(s), your boat name and your router's name.
+After you've engaged a weather router set his email address in the "Destination Email" field and set three lines of "Information" to your name(s), your boat name and your router's name.
 
 ## Custom
 **Note:** you can copy a pre-defined template using the "Copy" button.
@@ -40,7 +39,7 @@ You can define custom email body and subject templates using the following field
 - {lon<loc format>} -- Longitude.
 - {local<time format>} -- Local time.
 - {utc<time format>} -- Time in UTC.
-- {tz[separator]} -- Local Time Zone, of the form "+05[separator]30".
+- {tz[hmn]} -- Local Time Zone, e.g. 'h' gives "+06", 'm' gives "30" and 'n' gives "CCT".
 - {info[index]} -- Additional information line indexed from 0 (0 is optional). 
 
 Where **<loc format>** can be:

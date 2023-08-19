@@ -6,7 +6,7 @@ import 'package:json_annotation/json_annotation.dart';
 part 'settings.g.dart';
 
 enum Templates {
-  predictWind('Predict Wind', '{info} {lat-d.ddddd} {lon-d.ddddd} {localyyyy-MM-dd HH:mm}{tz}', ['tracking@predictwind.com'], ''),
+  predictWind('Predict Wind', '{info} {lat-d.ddddd} {lon-d.ddddd} {localyyyy-MM-dd HH:mm}{tzh}{tzm}', ['tracking@predictwind.com'], ''),
   noForeignLand('No Foreign Land', 'LAT|{latd|m.mmm|c}\nLON|{lond|m.mmm|c}', ['tracking@noforeignland.com'], ''),
   noForeignLandBlog('No Foreign Land + Blog', 'LAT|{latd|m.mmm|c}\nLON|{lond|m.mmm|c}\n\nBlog here\n----', ['tracking@noforeignland.com'], ''),
   weatherRouter('Weather Router', 'Hi {info2},\n\nOn {utcyyyy-MM-dd} at {utcHH:mm} UTC, {info1} is at:\n\n{latd m.mmm c}, {lond m.mmm c}\n\nKind Regards\n{info}', null, 'Position of {info} on {info1}'),
