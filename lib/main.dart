@@ -40,6 +40,7 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
   late LatLongFormatter bodyFormatter;
   late LatLongFormatter subjectFormatter;
 
+  String subject = '';
   String body = '';
 
   _MainState() {
@@ -94,13 +95,17 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
     List<Widget> list = [];
 
     if (locationData != null && ((locationData?.accuracy?.round())! <= (settings.accuracy.round()))) {
-      body = getBody();
+      subject = subjectFormatter.format(LatLong(locationData!.latitude!, locationData!.longitude!), info: settings.info);
+      body = bodyFormatter.format(LatLong(locationData!.latitude!, locationData!.longitude!), info: settings.info);
 
       if(settings.firstUse) {
         list.add(ListTile(leading: const Text("Please review Settings before first use"), title: IconButton(onPressed: () => showSettingsPage(), icon: const Icon(Icons.settings))));
       }
 
       list.add(ListTile(title: Text("Location acquired to ${locationData?.accuracy?.round()}m")));
+      if(subject.isNotEmpty) {
+        list.add(ListTile(title: Text("Subject: $subject")));
+      }
       list.add(ListTile(title: Text(body)));
       list.add(Row(mainAxisAlignment: MainAxisAlignment.center, children: [
         IconButton(onPressed: sendEmail, icon: const Icon(Icons.email), iconSize: 64.0),
@@ -150,16 +155,12 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
     }
   }
 
-  String getBody() {
-    return bodyFormatter.format(LatLong(locationData!.latitude!, locationData!.longitude!), ident: settings.ident);
-  }
-
   void sendEmail() async {
     List<String> recipients = settings.template.destinationEmails??settings.destinationEmails;
 
     final Email email = Email(
       body: body,
-      subject: subjectFormatter.format(LatLong(locationData!.latitude!, locationData!.longitude!), ident: settings.ident),
+      subject: subject,
       recipients: recipients,
       isHTML: false,
     );
@@ -182,7 +183,7 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
   }
 
   void share() async {
-    await Share.share(body);
+    await Share.share("$subject\n\n$body");
 
     // The iOS guidelines prohibit the auto-closing of apps.
     if (!Platform.isIOS && settings.autoClose) {

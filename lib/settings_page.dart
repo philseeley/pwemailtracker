@@ -56,14 +56,14 @@ class _SettingsState extends State<SettingsPage> {
 
     list.addAll([
       ListTile(
-          leading: const Text("Identity"),
+          leading: const Text("Information"),
             title: TextFormField(
             textInputAction: TextInputAction.newline,
             keyboardType: TextInputType.multiline,
             minLines: 1,
             maxLines: null,
-            initialValue: settings.ident.join('\n'),
-            onChanged: (value) => settings.ident = value.trim().split('\n')
+            initialValue: settings.info.join('\n'),
+            onChanged: (value) => settings.info = value.trim().split('\n')
           )
       ),
       ListTile(
