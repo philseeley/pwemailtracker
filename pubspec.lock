@@ -395,10 +395,11 @@ packages:
   latlong_formatter:
     dependency: "direct main"
     description:
-      path: "../latlong_formatter"
-      relative: true
-    source: path
-    version: "0.0.1"
+      name: latlong_formatter
+      sha256: "3d7eae1c0bb956c212bad7ee3815116008d176daace51902f508d1e90996d3ce"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
   lints:
     dependency: transitive
     description:
