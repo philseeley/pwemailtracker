@@ -15,7 +15,7 @@ Settings _$SettingsFromJson(Map<String, dynamic> json) => Settings(
       info:
           (json['info'] as List<dynamic>?)?.map((e) => e as String).toList() ??
               const [],
-      destinationEmails: (json['destinationEmails'] as List<dynamic>?)
+      emailsAddresses: (json['emailsAddresses'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
           const [],
@@ -29,7 +29,7 @@ Map<String, dynamic> _$SettingsToJson(Settings instance) => <String, dynamic>{
       'accuracy': instance.accuracy,
       'autoClose': instance.autoClose,
       'info': instance.info,
-      'destinationEmails': instance.destinationEmails,
+      'emailsAddresses': instance.emailsAddresses,
       'subjectTemplate': instance.subjectTemplate,
       'bodyTemplate': instance.bodyTemplate,
     };

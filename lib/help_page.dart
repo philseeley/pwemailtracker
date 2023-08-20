@@ -18,7 +18,9 @@ Set the location "Accuracy" appropriate for you. You can email or share the data
 
 On Android, if "Auto Close" is enabled, the app will close once the "EMail" or "Share" buttons have been pressed. This is not available on iOS as it is against their guidelines.
 
-Predefined templates sre provided for well known tracking applications and destinations.
+Predefined templates sre provided for well known tracking applications and EMail Addresses.
+
+Multiple EMail Addresses (one per-line) can be specified when using the "Weather Router" or "Custom" templates.
 
 Contact [Phil](mailto:feedback@wheretofly.info?subject=EMail%20Tracker%20Feedback) if you would like a well known template added.
 
@@ -29,7 +31,7 @@ The first line of "Information" is required to be your account email address, bu
 Make sure the email you send from is configured in the web app, see [https://www.noforeignland.com/help/boat/move-email](https://www.noforeignland.com/help/boat/move-email)
 
 ## Weather Router
-After you've engaged a weather router set his email address in the "Destination Email" field and set three lines of "Information" to your name(s), your boat name and your router's name.
+After you've engaged a weather router set his email address in the "Email Addresses" field and set three lines of "Information" to your name(s), your boat name and your router's name.
 
 ## Custom
 **Note:** you can copy a pre-defined template using the "Copy" button.
@@ -72,7 +74,7 @@ Hi {info2},
 
 On {utcyyyy-MM-dd} at {utcHH:mm} UTC, {info1} is at:
 
-{latd m.mmm c}, {lond m.mmm c}
+{lat0d 0m.mmm c}, {lon0d 0m.mmm c}
 
 Cheers
 {info}
@@ -81,9 +83,9 @@ Would produce:
 ```
 Hi Fred,
 
-On 2023-08-16 at 19:02 UTC, SV Billy Do is at:
+On 2023-08-20 at 07:32 UTC, SV Billy Do is at:
 
-5 3.544 S, 39 7.043 E
+05 03.460 S, 039 07.070 E
 
 Cheers
 Joe Blogs

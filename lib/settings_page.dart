@@ -60,7 +60,7 @@ class _SettingsState extends State<SettingsPage> {
             title: TextFormField(
             textInputAction: TextInputAction.newline,
             keyboardType: TextInputType.multiline,
-            minLines: 1,
+            minLines: 2,
             maxLines: null,
             initialValue: settings.info.join('\n'),
             onChanged: (value) => settings.info = value.trim().split('\n')
@@ -80,14 +80,14 @@ class _SettingsState extends State<SettingsPage> {
             icon:const Icon(Icons.copy))
       ),
       ListTile(
-          leading: const Text("Destination Emails"),
+          leading: const Text("Emails Addresses"),
           title: TextFormField(
             textInputAction: TextInputAction.newline,
             keyboardType: TextInputType.multiline,
-            minLines: 1,
+            minLines: 2,
             maxLines: null,
-            initialValue: settings.destinationEmails.join('\n'),
-            onChanged: (value) => settings.destinationEmails = value.trim().split('\n')
+            initialValue: settings.emailsAddresses.join('\n'),
+            onChanged: (value) => settings.emailsAddresses = value.trim().split('\n')
           )
       ),
       ListTile(
@@ -104,7 +104,7 @@ class _SettingsState extends State<SettingsPage> {
             enabled: settings.template == Templates.custom,
             textInputAction: TextInputAction.newline,
             keyboardType: TextInputType.multiline,
-            minLines: 1,
+            minLines: 2,
             maxLines: null,
             initialValue: settings.bodyTemplate,
             onChanged: (value) => settings.bodyTemplate = value

@@ -27,7 +27,7 @@ class Settings {
   double accuracy;
   bool autoClose;
   List<String> info;
-  List<String> destinationEmails;
+  List<String> emailsAddresses;
   String subjectTemplate;
   String bodyTemplate;
 
@@ -39,7 +39,7 @@ class Settings {
     this.accuracy = 10.0,
     this.autoClose = false,
     this.info = const [],
-    this.destinationEmails = const [],
+    this.emailsAddresses = const [],
     this.subjectTemplate = '',
     this.bodyTemplate = ''
   });
