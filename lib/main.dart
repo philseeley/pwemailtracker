@@ -32,13 +32,14 @@ class _Main extends StatefulWidget {
 }
 
 class _MainState extends State<_Main> with WidgetsBindingObserver {
-
-  late Settings settings;
+  // These default settings will be overwritten if already saved by init().
+  Settings settings = Settings();
 
   Location location = Location();
   LocationData? locationData;
-  late LatLongFormatter bodyFormatter;
-  late LatLongFormatter subjectFormatter;
+  // These default formatters will be overwritten after settings have been loaded.
+  LatLongFormatter bodyFormatter = LatLongFormatter('');
+  LatLongFormatter subjectFormatter = LatLongFormatter('');
 
   String subject = '';
   String body = '';
