@@ -58,6 +58,8 @@ class Settings {
       dynamic data = json.decode(s ?? "");
 
       return Settings.fromJson(data);
+    } on Exception {
+      return Settings();
     } on Error {
       return Settings();
     }
