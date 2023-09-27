@@ -114,7 +114,6 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
       ]));
     } else {
       list.add(ListTile(title: Text(format("Waiting for accurate Location{}", (locationData != null) ? ": ${locationData?.accuracy?.round()}m" : ""))));
-      body = '';
     }
 
     return Scaffold(
@@ -184,7 +183,8 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
   }
 
   void share() async {
-    await Share.share("$subject\n\n$body");
+    String s = subject.isNotEmpty ? "$subject\n\n" : "";
+    await Share.share("$s$body");
 
     // The iOS guidelines prohibit the auto-closing of apps.
     if (!Platform.isIOS && settings.autoClose) {
