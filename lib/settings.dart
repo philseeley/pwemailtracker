@@ -10,6 +10,7 @@ enum Templates {
   noForeignLand('No Foreign Land', 'LAT|{latd|m.mmm|c}\nLON|{lond|m.mmm|c}', ['tracking@noforeignland.com'], ''),
   noForeignLandBlog('No Foreign Land + Blog', 'LAT|{latd|m.mmm|c}\nLON|{lond|m.mmm|c}\n\nBlog here\n----', ['tracking@noforeignland.com'], ''),
   weatherRouter('Weather Router', 'Hi {info2},\n\nOn {utcyyyy-MM-dd} at {utcHH:mm} UTC, {info1} is at:\n\n{latd m.mmm c}, {lond m.mmm c}\n\nKind Regards\n{info}', null, 'Position of {info} on {info1}'),
+  googleMaps('Google Maps', '{info2},\n\nhttps://www.google.com/maps/search/?api=1&query={lat-d.ddddd}%2C{lon-d.ddddd}\n\nCheers\n{info}', null, 'Position of {info} on {info1}'),
   custom('Custom', null, null, null);
 
   final String name;

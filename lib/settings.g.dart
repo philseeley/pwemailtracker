@@ -39,5 +39,6 @@ const _$TemplatesEnumMap = {
   Templates.noForeignLand: 'noForeignLand',
   Templates.noForeignLandBlog: 'noForeignLandBlog',
   Templates.weatherRouter: 'weatherRouter',
+  Templates.googleMaps: 'googleMaps',
   Templates.custom: 'custom',
 };
