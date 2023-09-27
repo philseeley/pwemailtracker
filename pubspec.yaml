@@ -39,7 +39,7 @@ dependencies:
   share:
   markdown_widget:
   url_launcher:
-  latlong_formatter: ^1.0.1
+  latlong_formatter: ^2.0.0
   #  path: ../latlong_formatter
 
 dev_dependencies:
@@ -51,8 +51,9 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^1.0.0
+  flutter_lints: ^2.0.3
   build_runner:
+  build_runner_core: ^7.2.9
   json_serializable:
 
 # For information on the generic Dart part of this file, see the
