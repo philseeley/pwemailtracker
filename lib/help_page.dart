@@ -25,6 +25,8 @@ Multiple EMail Addresses (one per-line) can be specified when using the "Weather
 Contact [Phil](mailto:feedback@wheretofly.info?subject=EMail%20Tracker%20Feedback) if you would like a well known template added.
 
 ## Predict Wind
+**NOTE:** Predict Wind have disabled this option at the moment. Please consider contacting them and asking them to re-enable it.
+
 The first line of "Information" is required to be your account email address, but emails can be sent from any address.
 
 ## No Foreign Land (+ Blog)
@@ -32,6 +34,9 @@ Make sure the email you send from is configured in the web app, see [https://www
 
 ## Weather Router
 After you've engaged a weather router set his email address in the "Email Addresses" field and set three lines of "Information" to your name(s), your boat name and your router's name.
+
+## Google Maps
+Set the desired "Email Addresses" field and set three lines of "Information" to your name(s), your boat name and your greeting.
 
 ## Custom
 **Note:** you can copy a pre-defined template using the "Copy" button.
