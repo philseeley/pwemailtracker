@@ -10,7 +10,7 @@ class SettingsPage extends StatefulWidget {
   const SettingsPage(this.settings, {Key? key}) : super(key: key);
 
   @override
-  _SettingsState createState() => _SettingsState();
+  createState() => _SettingsState();
 }
 
 class _SettingsState extends State<SettingsPage> {
@@ -22,7 +22,7 @@ class _SettingsState extends State<SettingsPage> {
     List<DropdownMenuItem<Templates>> formatItems = [];
 
     for (var t in Templates.values) {
-      formatItems.add(DropdownMenuItem(child: Text(t.name), value: t));
+      formatItems.add(DropdownMenuItem(value: t, child: Text(t.name)));
     }
 
     List<Widget> list = [
