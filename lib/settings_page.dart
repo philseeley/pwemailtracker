@@ -29,16 +29,16 @@ class _SettingsState extends State<SettingsPage> {
       ListTile(
         leading: const Text("Accuracy"),
         title: Slider(
-            min: 5.0,
-            max: 100.0,
-            divisions: 19,
-            value: settings.accuracy,
-            label: "${settings.accuracy}",
-            onChanged: (double value) {
-              setState(() {
-                settings.accuracy = value;
-              });
-            }),
+          min: 5.0,
+          max: 100.0,
+          divisions: 19,
+          value: settings.accuracy,
+          label: "${settings.accuracy.toInt()}m",
+          onChanged: (double value) {
+            setState(() {
+              settings.accuracy = value;
+            });
+          }),
       ),
     ];
 
