@@ -93,6 +93,7 @@ class _SettingsState extends State<SettingsPage> {
       ListTile(
           leading: const Text("Subject Template"),
           title: TextFormField(
+            key: UniqueKey(),
             enabled: settings.template == Templates.custom,
             initialValue: settings.subjectTemplate,
             onChanged: (value) => settings.subjectTemplate = value.trim()
@@ -101,6 +102,7 @@ class _SettingsState extends State<SettingsPage> {
       ListTile(
           leading: const Text("Body Template"),
           title: TextFormField(
+            key: UniqueKey(),
             enabled: settings.template == Templates.custom,
             textInputAction: TextInputAction.newline,
             keyboardType: TextInputType.multiline,
@@ -119,7 +121,7 @@ class _SettingsState extends State<SettingsPage> {
           IconButton(onPressed: () {showHelpPage();}, icon:const Icon(Icons.help))
         ],
       ),
-      body: ListView(key: UniqueKey(), children: list)
+      body: ListView(children: list)
     );
   }
 
