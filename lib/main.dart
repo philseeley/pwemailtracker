@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/services.dart';
@@ -35,7 +36,8 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
   // These default settings will be overwritten if already saved by init().
   Settings settings = Settings();
 
-  Location location = Location();
+  final Location location = Location();
+  StreamSubscription<LocationData>? locationSubscription;
   LocationData? locationData;
   // These default formatters will be overwritten after settings have been loaded.
   LatLongFormatter bodyFormatter = LatLongFormatter('');
@@ -44,17 +46,23 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
   String subject = '';
   String body = '';
 
-  _MainState() {
-    init();
-  }
-
   init() async {
     settings = await Settings.load();
 
-    if(await location.serviceEnabled()) {
-      location.onLocationChanged.listen(getLocation);
-    } else {
-      Fluttertoast.showToast(msg: "Location is disabled", toastLength: Toast.LENGTH_LONG);
+    while(locationSubscription == null) {
+      try {
+        if (await location.serviceEnabled()) {
+          locationSubscription ??= location.onLocationChanged.listen(getLocation);
+        } else {
+          Fluttertoast.showToast(
+              msg: "Location is disabled", toastLength: Toast.LENGTH_LONG);
+          break;
+        }
+      } on Exception {
+        Fluttertoast.showToast(
+            msg: "Waiting for Location service", toastLength: Toast.LENGTH_SHORT);
+        await Future.delayed(const Duration(seconds: 1));
+      }
     }
 
     setFormatters();
@@ -63,6 +71,7 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    init();
     WidgetsBinding.instance.addObserver(this);
   }
 
@@ -73,13 +82,23 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
   }
 
   @override
+  void dispose() {
+    locationSubscription?.cancel();
+    locationSubscription = null;
+    super.dispose();
+  }
+
+  @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch(state)
     {
       case AppLifecycleState.paused:
       case AppLifecycleState.inactive:
       case AppLifecycleState.detached:
+      case AppLifecycleState.hidden:
         settings.save();
+        locationSubscription?.cancel();
+        locationSubscription = null;
 
         setState(() {
           locationData = null;
@@ -87,6 +106,7 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
 
         break;
       case AppLifecycleState.resumed:
+        init();
         break;
     }
   }
