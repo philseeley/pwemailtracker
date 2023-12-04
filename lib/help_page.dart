@@ -14,9 +14,9 @@ class HelpPage extends StatelessWidget {
         config: MarkdownConfig(configs: [LinkConfig(onTap: openURL)]),
         data: '''
 # Email Tracker
-Set the location "Accuracy" appropriate for you. You can email or share the data when your location has reached this accuracy.
+Set the location "Accuracy" appropriate for you. You can email or share the data when your location has been acquired to this accuracy. Restart the location acquisition by pressing the Refresh button.
 
-On Android, if "Auto Close" is enabled, the app will close once the "EMail" or "Share" buttons have been pressed. This is not available on iOS as it is against their guidelines.
+On Android, if "Auto Close" is enabled, the app will close once the "EMail" or "Share" buttons have been pressed. This is not available on iOS as it is against their App guidelines.
 
 Predefined templates sre provided for well known tracking applications and EMail Addresses.
 

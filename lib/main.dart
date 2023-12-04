@@ -2,12 +2,10 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/services.dart';
-import 'package:format/format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:share/share.dart';
 import 'package:location/location.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:latlong_formatter/latlong_formatter.dart';
 import 'settings.dart';
 import 'settings_page.dart';
@@ -33,8 +31,7 @@ class _Main extends StatefulWidget {
 }
 
 class _MainState extends State<_Main> with WidgetsBindingObserver {
-  // These default settings will be overwritten if already saved by init().
-  Settings settings = Settings();
+  Settings? settings;
 
   final Location location = Location();
   StreamSubscription<LocationData>? locationSubscription;
@@ -46,45 +43,70 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
   String subject = '';
   String body = '';
 
-  init() async {
-    settings = await Settings.load();
+  String? msg;
 
+  _MainState() {
+    loadSettings();
+  }
+
+  loadSettings() async {
+    settings = await Settings.load();
+    setFormatters();
+
+    setState(() {});
+  }
+
+  listenLocation() async {
     while(locationSubscription == null) {
       try {
-        if (await location.serviceEnabled()) {
-          locationSubscription ??= location.onLocationChanged.listen(getLocation);
+        PermissionStatus permStatus = await location.requestPermission();
+
+        if ([PermissionStatus.granted, PermissionStatus.grantedLimited].contains(permStatus)) {
+          if (await location.serviceEnabled()) {
+            locationSubscription ??=
+                location.onLocationChanged.listen(getLocation);
+            msg = null;
+          } else {
+            setState(() {
+              msg = "Location is disabled";
+            });
+          }
         } else {
-          Fluttertoast.showToast(
-              msg: "Location is disabled", toastLength: Toast.LENGTH_LONG);
-          break;
+          setState(() {
+            msg = "Location permission denied. Please allow";
+          });
         }
+
+        break;
       } on Exception {
-        Fluttertoast.showToast(
-            msg: "Waiting for Location service", toastLength: Toast.LENGTH_SHORT);
+        msg = 'Waiting for Location service';
         await Future.delayed(const Duration(seconds: 1));
       }
     }
+  }
 
-    setFormatters();
+  void cancelLocation() {
+    locationSubscription?.cancel();
+    locationSubscription = null;
   }
 
   @override
   void initState() {
     super.initState();
-    init();
+    listenLocation();
     WidgetsBinding.instance.addObserver(this);
   }
 
   getLocation(LocationData loc) {
     setState(() {
       locationData = loc;
+      msg = null;
     });
   }
 
   @override
   void dispose() {
-    locationSubscription?.cancel();
-    locationSubscription = null;
+    cancelLocation();
     super.dispose();
   }
 
@@ -96,9 +118,8 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
       case AppLifecycleState.inactive:
       case AppLifecycleState.detached:
       case AppLifecycleState.hidden:
-        settings.save();
-        locationSubscription?.cancel();
-        locationSubscription = null;
+        settings?.save();
+        cancelLocation();
 
         setState(() {
           locationData = null;
@@ -106,7 +127,7 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
 
         break;
       case AppLifecycleState.resumed:
-        init();
+        listenLocation();
         break;
     }
   }
@@ -115,25 +136,50 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     List<Widget> list = [];
 
-    if (locationData != null && ((locationData?.accuracy?.round())! <= (settings.accuracy.round()))) {
-      subject = subjectFormatter.format(LatLong(locationData!.latitude!, locationData!.longitude!), info: settings.info);
-      body = bodyFormatter.format(LatLong(locationData!.latitude!, locationData!.longitude!), info: settings.info);
-
-      if(settings.firstUse) {
-        list.add(ListTile(leading: const Text("Please review Settings before first use"), title: IconButton(onPressed: () => showSettingsPage(), icon: const Icon(Icons.settings))));
+    if(settings != null) {
+      if (settings!.firstUse) {
+        list.add(ListTile(
+            leading: const Text("Please review Settings before first use"),
+            title: IconButton(onPressed: () => showSettingsPage(),
+                icon: const Icon(Icons.settings))));
       }
 
-      list.add(ListTile(title: Text("Location acquired to ${locationData?.accuracy?.round()}m")));
-      if(subject.isNotEmpty) {
-        list.add(ListTile(title: Text("Subject: $subject")));
+      if (locationData != null &&
+          ((locationData?.accuracy?.round())! <= (settings!.accuracy.round()))) {
+        cancelLocation();
+
+        subject = subjectFormatter.format(
+            LatLong(locationData!.latitude!, locationData!.longitude!),
+            info: settings!.info);
+        body = bodyFormatter.format(
+            LatLong(locationData!.latitude!, locationData!.longitude!),
+            info: settings!.info);
+
+        list.add(ListTile(
+            title: Text(
+                "Location acquired to ${locationData?.accuracy?.round()}m"),
+            trailing: IconButton(
+                onPressed: listenLocation, icon: const Icon(Icons.refresh))));
+
+        if (subject.isNotEmpty) {
+          list.add(ListTile(title: Text("Subject: $subject")));
+        }
+
+        list.add(ListTile(title: Text(body)));
+        list.add(Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          IconButton(onPressed: sendEmail,
+              icon: const Icon(Icons.email),
+              iconSize: 64.0),
+          IconButton(
+              onPressed: share, icon: const Icon(Icons.share), iconSize: 64.0)
+        ]));
+      } else {
+        //      list.add(ListTile(title: Text(format("Waiting for accurate Location{}", (locationData != null) ? ": ${locationData?.accuracy?.round()}m" : ""))));
+        list.add(ListTile(title: Text(msg ??
+            'Waiting for accurate Location${(locationData != null)
+                ? ": ${locationData?.accuracy?.round()}m"
+                : ""}')));
       }
-      list.add(ListTile(title: Text(body)));
-      list.add(Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-        IconButton(onPressed: sendEmail, icon: const Icon(Icons.email), iconSize: 64.0),
-        IconButton(onPressed: share, icon: const Icon(Icons.share), iconSize: 64.0)
-      ]));
-    } else {
-      list.add(ListTile(title: Text(format("Waiting for accurate Location{}", (locationData != null) ? ": ${locationData?.accuracy?.round()}m" : ""))));
     }
 
     return Scaffold(
@@ -143,10 +189,9 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
   }
 
   showSettingsPage () async {
-
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
-        return SettingsPage(settings);
+        return SettingsPage(settings!);
       }));
 
     setState(() {
@@ -155,20 +200,20 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
       } catch (e) {
         showError(context, e.toString());
       }
-      settings.firstUse = false;
+      settings!.firstUse = false;
     });
   }
 
   setFormatters() {
     try {
-      bodyFormatter = LatLongFormatter(settings.template.bodyTemplate ?? settings.bodyTemplate);
+      bodyFormatter = LatLongFormatter(settings!.template.bodyTemplate ?? settings!.bodyTemplate);
     } catch (e) {
       showError(context, e.toString());
       bodyFormatter = LatLongFormatter('');
     }
     try {
       subjectFormatter =
-          LatLongFormatter(settings.template.subjectTemplate ?? settings.subjectTemplate);
+          LatLongFormatter(settings!.template.subjectTemplate ?? settings!.subjectTemplate);
     } catch (e) {
       showError(context, e.toString());
       bodyFormatter = LatLongFormatter('');
@@ -176,7 +221,7 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
   }
 
   void sendEmail() async {
-    List<String> recipients = settings.template.destinationEmails??settings.emailsAddresses;
+    List<String> recipients = settings!.template.destinationEmails??settings!.emailsAddresses;
 
     final Email email = Email(
       body: body,
@@ -192,12 +237,12 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
         showError(context, 'On iOS you must install and configure the Apple EMail App with an account.');
       }
       else {
-        showError(context, "Please screenshot this error and send to the developer: "+e.toString());
+        showError(context, "Please screenshot this error and send to the developer: $e");
       }
     }
 
     // The iOS guidelines prohibit the auto-closing of apps.
-    if (!Platform.isIOS && settings.autoClose) {
+    if (!Platform.isIOS && settings!.autoClose) {
       SystemNavigator.pop();
     }
   }
@@ -207,7 +252,7 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
     await Share.share("$s$body");
 
     // The iOS guidelines prohibit the auto-closing of apps.
-    if (!Platform.isIOS && settings.autoClose) {
+    if (!Platform.isIOS && settings!.autoClose) {
       SystemNavigator.pop();
     }
   }

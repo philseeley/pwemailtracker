@@ -32,14 +32,12 @@ dependencies:
 
   flutter_email_sender:
   location:
-  fluttertoast:
   json_annotation:
   path_provider:
   intl:
   share:
   markdown_widget:
   url_launcher:
-  format:
   latlong_formatter: ^2.0.0
   #  path: ../latlong_formatter
 
