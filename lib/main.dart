@@ -159,7 +159,7 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
             title: Text(
                 "Location acquired to ${locationData?.accuracy?.round()}m"),
             trailing: IconButton(
-                onPressed: listenLocation, icon: const Icon(Icons.refresh))));
+                onPressed: refreshLocation, icon: const Icon(Icons.refresh))));
 
         if (subject.isNotEmpty) {
           list.add(ListTile(title: Text("Subject: $subject")));
@@ -174,7 +174,6 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
               onPressed: share, icon: const Icon(Icons.share), iconSize: 64.0)
         ]));
       } else {
-        //      list.add(ListTile(title: Text(format("Waiting for accurate Location{}", (locationData != null) ? ": ${locationData?.accuracy?.round()}m" : ""))));
         list.add(ListTile(title: Text(msg ??
             'Waiting for accurate Location${(locationData != null)
                 ? ": ${locationData?.accuracy?.round()}m"
@@ -218,6 +217,14 @@ class _MainState extends State<_Main> with WidgetsBindingObserver {
       showError(context, e.toString());
       bodyFormatter = LatLongFormatter('');
     }
+  }
+
+  void refreshLocation() {
+    setState(() {
+      locationData = null;
+    });
+
+    listenLocation();
   }
 
   void sendEmail() async {
